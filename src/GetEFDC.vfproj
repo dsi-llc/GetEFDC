@@ -27,7 +27,7 @@
 			<Tool Name="VFPostBuildEventTool"/>
 			<Tool Name="VFManifestTool" SuppressStartupBanner="true"/>
 		</Configuration>
-		<Configuration Name="Debug|x64" UseCompiler="ifxCompiler" TargetName="$(ProjectName)_D">
+		<Configuration Name="Debug|x64" UseCompiler="ifortCompiler" TargetName="$(ProjectName)_D">
 			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" CallingConvention="callConventionCRef" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug" Interfaces="true"/>
 			<Tool Name="VFLinkerTool" OutputFile="$(OutDir)\$(TargetName).exe" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsoleXP"/>
 			<Tool Name="VFResourceCompilerTool"/>
