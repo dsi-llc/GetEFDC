@@ -9,9 +9,10 @@
     CONTAINS
 
     SUBROUTINE EFDCPRO
-    INTEGER(4)::NS,LL,I,J,L,K,K1
+    INTEGER(4)::NS,LL,I,J,L,K,K1,KK
     REAL(4)::ANG1,ANG2,ANG,XLNUTME,YLTUTMN,CCUE,CCVE,CCUN,CCVN,DZPC,MAXTHICK,DEPTHMIN,TMP,TMPCOR
     REAL(4),ALLOCATABLE:: THICK(:),DZC(:,:)
+    REAL(4),ALLOCATABLE:: R1D(:)
     CHARACTER*80 TEXT
 
     HFREOUT = 0
@@ -61,28 +62,41 @@
     CLOSE(1)
 
     KSZ = 1
-
     IF( IGRIDV > 0 )THEN
-        IF (IGRIDV == 2) SGZFILE = 'SGZLAYER.INP'
+        ALLOCATE(R1D(KCM))
+        R1D = 0.
         ! *** READ SGZ BOTTOM ACTIVE LAYER FOR SIGMA-ZED CELLS
         OPEN(1,FILE=SGZFILE,ACTION='READ',ERR=997)
         CALL SKIPCOM(1, 'C')
-        DO LL=2,LA
-            READ(1,*,END=1000)I,J,K
+        if( IGRIDV == 1 )then
+          DO LL=2,LA
+            READ(1,*,END=1000) I, J, K
             L = LIJ(I,J)
-            KSZ(L)=K  ! BED LAYER
-        ENDDO
+            KSZ(L) = K  ! BED LAYER
+          ENDDO
+        else
+          DO LL=2,LA
+            READ(1,*,END=1000) I, J, K, (R1D(KK),KK = 1,KC)
+            L = LIJ(I,J)
+            KSZ(L) = K  ! BED LAYER
+            DZPC = SUM(R1D(:))
+            if( DZPC < 1.0 ) DZPC = 1.0
+            DZCS(L,:) = R1D(:)/DZPC
+          ENDDO
+        endif
 1000    CLOSE(1)
     ENDIF
-
-    ! **
-    DZCS = 0
-    DO L=2,LA
-        DZPC = SUM(DZCK(KSZ(L):KC))
-        DO K=KSZ(L),KC
-            DZCS(L,K) = DZCK(K)/DZPC
-        ENDDO
-    ENDDO
+    
+    if( IGRIDV <= 1 )then
+      ! **
+      DZCS = 0
+      DO L=2,LA
+          DZPC = SUM(DZCK(KSZ(L):KC))
+          DO K=KSZ(L),KC
+              DZCS(L,K) = DZCK(K)/DZPC
+          ENDDO
+      ENDDO
+    endif
 
     RETURN
 997 PRINT*, ' **** OPEN ERROR: SGZFILE '

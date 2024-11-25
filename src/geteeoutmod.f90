@@ -378,9 +378,9 @@
     SUBROUTINE GETEE_WC
     
     ! *** READING AND EXPORTING WATER COLUMN OF CONSTITUENTS OUTPUT
-    INTEGER(4)::VER,LINES,L,NT,K,NTM1,N,LA1,NSXD,NS,NBEDSTEPS,NTS,NLYR
+    INTEGER(4)::VER,LINES,L,NT,K,NTM1,N,LA1,NSXD,NS,NBEDSTEPS,NTS
     INTEGER(4)::NW,MW,NACTIVE,N1,NX,JSEXPLORER,I,J,IOS
-    INTEGER(4)::HSIZE,BSIZE,IGRIDV,CELL3D,IEVAP,ISGWIE,ISICE
+    INTEGER(4)::HSIZE,BSIZE,IGRIDV,CELL3D,IEVAP,ISGWIE
     INTEGER(4)::IWQ(40)
     REAL(4)   ::TMP,WQ,EETIME,SHEAR,TMPVAL,DTIME1,DTIME2
     REAL(4)   ::ZK1,ZK2,VKT,VKB,ZABV
@@ -752,8 +752,7 @@
             IF(ISTRAN(1) > 0) THEN
                 READ(UWCI) ((SAL(L,K),K=KSZ(L),KC),L=2,LA)
                 DO L=2,LA
-                    NLYR = KC - KSZ(L) + 1
-                    SALA(L) = SUM(SAL(L,KSZ(L):KC))/NLYR
+                    SALA(L) = SUM(SAL(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDDO
             ENDIF
 
@@ -761,8 +760,7 @@
                 READ(UWCI) ((TEM(L,K),K=KSZ(L),KC),L=2,LA)
                 IF(TBEDIT > 0) READ(UWCI) (TEMB(L),L=2,LA)
                 DO L=2,LA
-                    NLYR = KC - KSZ(L) + 1
-                    TEMA(L) = SUM(TEM(L,KSZ(L):KC))/NLYR
+                    TEMA(L) = SUM(TEM(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDDO
                 !** VER 7300
                 IF (IEVAP > 1 )THEN
@@ -775,16 +773,14 @@
             IF(ISTRAN(3) > 0) THEN
                 READ(UWCI) ((DYE(L,K),K=KSZ(L),KC),L=2,LA)
                 DO L=2,LA
-                    NLYR = KC - KSZ(L) + 1
-                    DYEA(L) = SUM(DYE(L,KSZ(L):KC))/NLYR
+                    DYEA(L) = SUM(DYE(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDDO
             ENDIF
 
             IF(ISTRAN(4) > 0) THEN
                 READ(UWCI) ((SFL(L,K),K=KSZ(L),KC),L=2,LA)
                 DO L=2,LA
-                    NLYR = KC - KSZ(L) + 1
-                    SFLA(L) = SUM(SFL(L,KSZ(L):KC))/NLYR
+                    SFLA(L) = SUM(SFL(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDDO
             ENDIF
 
@@ -792,9 +788,8 @@
                 READ(UWCI) ((TOXB(L,KBT(L),NT),L=2,LA),NT=1,NTOX)
                 READ(UWCI) (((TOX(L,K,NT),K=KSZ(L),KC),L=2,LA),NT=1,NTOX)
                 DO L=2,LA
-                    NLYR = KC - KSZ(L) + 1
                     DO NT=1,NTOX
-                        TOXA(L,NT) = SUM(TOX(L,KSZ(L):KC,NT))/NLYR
+                        TOXA(L,NT) = SUM(TOX(L,KSZ(L):KC,NT)*DZCS(L,KSZ(L):KC))
                     ENDDO
                 ENDDO
             ENDIF
@@ -819,18 +814,16 @@
                 IF(ISTRAN(6) > 0)THEN
                     READ(UWCI) (((SED(L,K,NS),K=KSZ(L),KC),L=2,LA),NS=1,NSED)
                     DO L=2,LA
-                        NLYR = KC - KSZ(L) + 1
                         DO NS=1,NSED
-                            SEDA(L,NS) = SUM(SED(L,KSZ(L):KC,NS))/NLYR
+                            SEDA(L,NS) = SUM(SED(L,KSZ(L):KC,NS)*DZCS(L,KSZ(L):KC))
                         ENDDO
                     ENDDO
                 ENDIF
                 IF(ISTRAN(7) > 0)THEN
                     READ(UWCI) (((SND(L,K,NX),K=KSZ(L),KC),L=2,LA),NX=1,NSND)
                     DO L=2,LA
-                        NLYR = KC - KSZ(L) + 1
                         DO NX=1,NSND
-                            SNDA(L,NX) = SUM(SND(L,KSZ(L):KC,NX))/NLYR
+                            SNDA(L,NX) = SUM(SND(L,KSZ(L):KC,NX)*DZCS(L,KSZ(L):KC))
                         ENDDO
                     ENDDO
                     IF(ISBDLDBC > 0)THEN
@@ -854,7 +847,6 @@
         ELSE
             DO L=2,LA
                 N1=KBT(L)
-                NLYR = KC - KSZ(L) + 1
                 IF(ISTRAN(6) > 0 .OR. ISTRAN(7) > 0)THEN
                     IF(LSEDZLJ)THEN
                         READ(UWCI)  BEDSHR(L)   !=TAU(L) * 0.1 / WATERDENS / 1000.
@@ -887,13 +879,13 @@
 
                 IF(ISTRAN(1) == 1) THEN
                     READ(UWCI)(SAL(L,K),K=KSZ(L),KC)
-                    SALA(L) = SUM(SAL(L,KSZ(L):KC))/NLYR
+                    SALA(L) = SUM(SAL(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDIF
 
                 IF(ISTRAN(2) == 1)THEN
                     READ(UWCI)(TEM(L,K),K=KSZ(L),KC)
                     IF(TBEDIT > 0) READ(UWCI) TEMB(L)
-                    TEMA(L) = SUM(TEM(L,KSZ(L):KC))/NLYR
+                    TEMA(L) = SUM(TEM(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                     !** VER 7300
                     IF( VER >= 7300 .AND. IEVAP > 1 )THEN
                         READ(UWCI) TMPVAL,TMPVAL  !REAL(EVAPT(L),4),REAL(RAINT(L),4)
@@ -903,19 +895,19 @@
 
                 IF(ISTRAN(3) == 1) THEN
                     READ(UWCI)(DYE(L,K),K=KSZ(L),KC)
-                    DYEA(L) = SUM(DYE(L,KSZ(L):KC))/NLYR
+                   DYEA(L) = SUM(DYE(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDIF
 
                 IF(ISTRAN(4) == 1) THEN
                     READ(UWCI)(SFL(L,K),K=KSZ(L),KC)
-                    SFLA(L) = SUM(SFL(L,KSZ(L):KC))/NLYR
+                    SFLA(L) = SUM(SFL(L,KSZ(L):KC)*DZCS(L,KSZ(L):KC))
                 ENDIF
 
                 IF(ISTRAN(5) == 1)THEN
                     READ(UWCI)(TOXB(L,N1,NT),NT=1,NTOX)
                     READ(UWCI)((TOX(L,K,NT),K=KSZ(L),KC),NT=1,NTOX)
                     DO NT=1,NTOX
-                        TOXA(L,NT) = SUM(TOX(L,KSZ(L):KC,NT))/NLYR
+                        TOXA(L,NT) = SUM(TOX(L,KSZ(L):KC,NT)*DZCS(L,KSZ(L):KC))
                     ENDDO
                 ENDIF
 
@@ -930,7 +922,7 @@
                         READ(UWCI)(SEDB(L,N1,NS),VFRBED(L,N1,NS),NS=1,NSED)
                         READ(UWCI)((SED(L,K,NS),K=KSZ(L),KC),NS=1,NSED)
                         DO NS=1,NSED
-                            SEDA(L,NS) = SUM(SED(L,KSZ(L):KC,NS))/NLYR
+                            SEDA(L,NS) = SUM(SED(L,KSZ(L):KC,NS)*DZCS(L,KSZ(L):KC))
                         ENDDO
                     ENDIF
 
@@ -938,7 +930,7 @@
                         READ(UWCI)(SNDB(L,N1,NX),VFRBED(L,N1,NX+NSED),NX=1,NSND)
                         READ(UWCI)((SND(L,K,NX),K=KSZ(L),KC),NX=1,NSND)
                         DO NX=1,NSND
-                            SNDA(L,NX) = SUM(SND(L,KSZ(L):KC,NX))/NLYR
+                            SNDA(L,NX) = SUM(SND(L,KSZ(L):KC,NX)*DZCS(L,KSZ(L):KC))
                         ENDDO
 
                         IF(ISBDLDBC > 0)THEN
@@ -1370,7 +1362,7 @@
     END SUBROUTINE
 
     SUBROUTINE GETEE_WQ
-    INTEGER(4)::NW,L,K,N,N1,I,J,IOS,NT,NLYR
+    INTEGER(4)::NW,L,K,N,N1,I,J,IOS,NT
     INTEGER(4) IWQ(40), NACTIVE,LA1,HSIZE,BSIZE,IGRIDV,CELL3D
     REAL(4)::EETIME,WQ,DTIME1,DTIME2
     REAL(4)   ::ZK1,ZK2,VKT,VKB,ZABV
@@ -1524,19 +1516,17 @@
             ENDDO
 
             DO L=2,LA
-                NLYR = KC-KSZ(L)+1
                 DO NW=1,NWQV
                     IF (IWQ(NW) == 0)THEN
                         DO K=KSZ(L),KC
                             WQV(L,K,NW)=0.0
                         ENDDO
                     ENDIF
-                    WQVA(L,NW) = SUM(WQV(L,KSZ(L):KC,NW))/NLYR
+                    WQVA(L,NW) = SUM(WQV(L,KSZ(L):KC,NW)*DZCS(L,KSZ(L):KC))
                 ENDDO
             ENDDO
         ELSE
             DO L=2,LA
-                NLYR = KC-KSZ(L)+1
                 DO K=KSZ(L),KC
                     DO NW=1,NWQV
                         IF(IWQ(NW) > 0)THEN
@@ -1548,7 +1538,7 @@
                     ENDDO
                 ENDDO
                 DO NW=1,NWQV
-                    WQVA(L,NW) = SUM(WQV(L,KSZ(L):KC,NW))/NLYR
+                    WQVA(L,NW) = SUM(WQV(L,KSZ(L):KC,NW)*DZCS(L,KSZ(L):KC))
                 ENDDO
             ENDDO
         ENDIF
