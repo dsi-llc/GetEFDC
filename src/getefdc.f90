@@ -44,7 +44,7 @@ LOGICAL(4)    ::RES,OUTS
 
 !*** READ GETEFDC.INP FILE DETERMINED BY USER
 PRINT*,'************************************************************************'
-PRINT*,'*** GetEFDC IS DEVELOPED BY DYNAMIC SOLUTIONS-INTERNATIONAL IN HANOI ***'
+PRINT*,'*** GetEFDC IS DEVELOPED BY DSI										 ***'
 PRINT*,'*** IT IS USED TO:                                                   ***'
 PRINT*,'***   EXTRACT EFDC OUTPUT FILES (BINARY) FOR LAYER/TIMESERIES DATA   ***'
 PRINT*,'*** THE OPTIONS FOR EXTRACTION DATA IS IN THE FILE GETEFDC.INP       ***'
