@@ -64,7 +64,7 @@ In order to run GetEFDC in Linux the user needs to implement the following steps
 * Clone the GetEFDC repository: https://github.com/dsi-llc/GetEFDC.git
 * Open the .sln file at the root of the repository.
 
-### output
+### Output
 
 After running GetEFDC a sub-folder “RESULT” is generated in the folder “#output” of the
 working model. The extracted files are ASCII with the following conventions for the file
