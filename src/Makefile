@@ -1,67 +1,84 @@
-.SUFFIXES:
+# Select the fortran compiler to use
+FC=/opt/intel/oneapi/mpi/latest/bin/mpiifx
 
-.SUFFIXES: .f90 .F90 .for .FOR .o
+# Compiler options
+#FFLAGS=-g -traceback -fpp -DENABLE_MPI -D_MPI -nofixed -qopenmp -DNCOUT
+FFLAGS=-traceback -qopenmp -pthread -O3 -fpp -DENABLE_MPI -D_MPI -DLINUX -real-size 32 -fpe0 -fp-model=source -fp-speculation=safe
+# Compilation options for debug mode
+#FFLAGS=-g -traceback -qopenmp -debug all -check all -fpp -DENABLE_MPI -D_MPI -DDEBUGGING -fpic -real-size 64 -fpe0 -fp-speculation=safe -multiple-processes=8
 
+# Preprocessor
 
-INCLUD   =  . 
-CDFDIR   =  .
-CDFLIBS  =  
+# Libs
+LIBS=
 
-### LINUX Intel Compiler call ############################################
-
-FC       = /opt/intel/bin/ifort 
-
-FFLAGS   = -O3
-#FFLAGS  = -O
-#FFLAGS  = -g  
-#FFLAGS  = -g -C
-#FFLAGS  = -fast
-
-########################################################################
-
-PROGRAM = getefdc
-PROGEXT = .x
+PROGRAM = getefdc.x
+SRCDIR=scr
+OBJDIR=obj
+OUTPUT = ./bin
 
 PROJHOME= ..
 
-DATADIR = $(PROJHOME)/SHED
+# Suffix rules
+.SUFFIXES: .f90 .F90 .for .FOR .o
+
+INCLUD   =   
+CDFDIR   =   
+CDFLIBS  =  
+
+# Include dependency list created by makedepf90
+#include .depend 
 
 
-# PROGRAM COMPONENTS  ##################################################
+# list directories containing other files
+SRCS=$(wildcard $(SRCDIR)/*.f90)
+OBJS=$(patsubst $(SRCDIR)/%.f90,$(OBJDIR)/%.o,$(SRCS))
 
-OBJS    =  infomod.o  efdcpromod.o tecmod.o geteeoutmod.o       \
-           xyijconv.o  gethfreqout.o 
+	  
+OBJSLINK=
 
-MODS    =  globalvars.o 
+  	  	 	  	  	 	 	  	 							 
+MODS    = src/globalvars.o src/tecmod.o src/infomod.o src/xyijconv.o src/efdcpromod.o src/geteeoutmod.o src/gethfreqout.o
 
-MAIN    =  getefdc.o
 
-EXEPROG = $(PROGRAM)$(PROGEXT)
+MODSLINK  =globalvars.o tecmod.o infomod.o xyijconv.o efdcpromod.o geteeoutmod.o gethfreqout.o
 
-###### FOR LINUX #######################################################	
+MAIN    = 
+
+
+EXEPROG = $(OUTPUT)/$(PROGRAM)
+
+
+###### FOR LINUX #######################################################
 
 $(EXEPROG) : $(OBJS) $(MODS) $(MAIN) 
   
-	$(FC) $(FFLAGS) $(CDFDIR) $(CDFLIBS) $(INCLUD) -o  $@  $(OBJS) $(MODS) $(MAIN) 
+	$(FC) $(FFLAGS) $(CDFDIR) $(CDFLIBS) $(INCLUD) -o  $@  $(OBJSLINK) $(MODSLINK) $(MAIN)
+
 
 # Recompile only source file of change #################################
 
 .f90.o: 
-	$(FC) $(FFLAGS)  $(INCLUD) -c $<
+	$(FC) $(FFLAGS) $(INCLUD) -c $<
 
 .F90.o: 
-	$(FC) $(FFLAGS)  $(INCLUD) -c $<
+	$(FC) $(FFLAGS) $(INCLUD) -c $<
 
 .for.o: 
-	$(FC) $(FFLAGS)  $(INCLUD) -c $<
+	$(FC) $(FFLAGS) $(INCLUD) -c $<
 
 .FOR.o: 
-	$(FC) $(FFLAGS)  $(INCLUD) -c $<
+	$(FC) $(FFLAGS) $(INCLUD) -c $<
 
 ### Special dependencies ###############################################
 
-$(OBJS)              : $(MODS) 
+$(OBJS)              : $(MODS)
 $(MAIN)              : $(OBJS)
  
 clean:
-	rm -f *.o *.mod *.x
+	rm -f *.o *.mod
+
+# Make dependency list
+#depend .depend :
+#	makedepf90 -W -DENABLE_MPI -o aaefdc $(SRCS) > .depend
+
