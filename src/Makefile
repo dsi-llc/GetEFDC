@@ -3,19 +3,21 @@ FC=/opt/intel/oneapi/mpi/latest/bin/mpiifx
 
 # Compiler options
 #FFLAGS=-g -traceback -fpp -DENABLE_MPI -D_MPI -nofixed -qopenmp -DNCOUT
-FFLAGS=-traceback -qopenmp -pthread -O3 -fpp -DENABLE_MPI -D_MPI -DLINUX -real-size 32 -fpe0 -fp-model=source -fp-speculation=safe
+FFLAGS=-traceback -qopenmp -pthread -O3 -fpp -DENABLE_MPI -D_MPI -DLINUX -real-size 32 -fpe0 -fp-model=source -fp-speculation=safe -multiple-processes=12
 # Compilation options for debug mode
 #FFLAGS=-g -traceback -qopenmp -debug all -check all -fpp -DENABLE_MPI -D_MPI -DDEBUGGING -fpic -real-size 64 -fpe0 -fp-speculation=safe -multiple-processes=8
+
+# Setup the OpenMP compiler options
+OMPFLAGS=#-qopenmp
+FPPFLAGS= 
 
 # Preprocessor
 
 # Libs
 LIBS=
 
-PROGRAM = getefdc.x
-SRCDIR=scr
-OBJDIR=obj
-OUTPUT = ./bin
+PROGRAM = getefdc
+PROGEXT = .x
 
 PROJHOME= ..
 
@@ -31,8 +33,9 @@ CDFLIBS  =
 
 
 # list directories containing other files
-SRCS=$(wildcard $(SRCDIR)/*.f90)
-OBJS=$(patsubst $(SRCDIR)/%.f90,$(OBJDIR)/%.o,$(SRCS))
+SRCS=*.f90 */*.f90 
+	  
+OBJS= 
 
 	  
 OBJSLINK=
@@ -43,10 +46,10 @@ MODS    = src/globalvars.o src/tecmod.o src/infomod.o src/xyijconv.o src/efdcpro
 
 MODSLINK  =globalvars.o tecmod.o infomod.o xyijconv.o efdcpromod.o geteeoutmod.o gethfreqout.o
 
-MAIN    = 
+MAIN    = src/getefdc.f90
 
 
-EXEPROG = $(OUTPUT)/$(PROGRAM)
+EXEPROG = $(PROGRAM)$(PROGEXT)
 
 
 ###### FOR LINUX #######################################################
