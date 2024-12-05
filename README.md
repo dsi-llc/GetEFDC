@@ -74,5 +74,13 @@ names:
 * The last character group is _DOM for the domain or CEL for the selected cells
 * The vertical profiles for the constituents at the selected cells use the group _PROF in the file names, such as SAL_PROF.DAT
 
+### Files
+
+This folder contains the following files:
+
+* GetEFDC.inp: The settings file for the GetEFDC tool.
+* GetEFDC.bat: A batch file used to run GetEFDC on Windows.
+* Makefile: Used to compile GetEFDC.x for Linux.
+
 ## Contribute
 The open source availability of this code will make it easier for scientists, researchers, and developers to contribute to the code and build more trust in their models. We welcome all the opportunities to collaborate. If you would like to contribute to the source code development, please clone the repository and submit pull requests as needed. For more active contribution and role, please email admin@ds-intl.biz
