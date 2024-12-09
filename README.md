@@ -53,16 +53,35 @@ In order to run GetEFDC in Linux the user needs to implement the following steps
 <hr>
 
 ### Windows
+**Step 1:**
+* Clone the GetEFDC repository: https://github.com/dsi-llc/GetEFDC.git
 
-* Install Visual Studio:  
+**Step 2:** Install the following software in the specified order:
+
+* Install Visual Studio:
 [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/)
 
-* Install the Intel Toolkits:  
-[Intel OneApi Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html)  
-[Intel OneApi HPC Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/hpc-toolkit-download.html)
+* Install the Intel Toolkits:
+  
+  [Intel OneApi Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html)
 
-* Clone the GetEFDC repository: https://github.com/dsi-llc/GetEFDC.git
-* Open the .sln file at the root of the repository.
+  [Intel OneApi HPC Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/hpc-toolkit-download.html)
+
+**Step 3:** Open the GetEFDC.sln file with Visual Studio. You should reload your project if it says incompatible, then set the Intel compiler to IFX/IFORT.
+
+**Step 4:** Build with Release mode.
+
+**Step 5:** Copy the GetEFDC.exe file from the built folder (GetEFDC-main\src\x64\Debug\GetEFDC.exe) to the folder containing the following files: (GetEFDC.bat, GetEFDC.inp, and Makefile)
+
+**Step 6:** Open the GetEFDC.inp file.
+
+* Update the path to the efdc.inp file (of the model for which you want to extract results).
+
+* Update the number of points for which results need to be extracted.
+
+* Update the I and J indices for those points.
+
+**Step 7:** Run the GetEFDC.bat file and check the results.
 
 ### Output
 
